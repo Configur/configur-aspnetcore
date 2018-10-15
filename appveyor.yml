@@ -1,0 +1,41 @@
+# Configur ASP.NET Core
+
+image: Visual Studio 2017
+
+skip_tags: true
+
+configuration:
+  - Release
+
+build_script:
+  - ps: .\build.ps1
+
+test: off
+
+notifications:
+  - provider: Slack
+    incoming_webhook:
+      secure: RFquDLyA/yMQSUsbR7SybhyKMno+58+bDCRVuJpXLdSZJNjinKZojwxT6ajMCO6ot+P1x0dy39JppktYegzSMDRg2NsfRCt0WH6vwmlosv0=
+
+for:
+
+-
+  branches:
+    only:
+      - master
+
+  version: 0.1.0
+
+  deploy:
+    - provider: Environment
+      name: configur-github-aspnetcore
+
+    - provider: Environment
+      name: configur-nuget-aspnetcore
+
+-
+  branches:
+    except:
+    - master
+
+  version: 0.1.0.{build}-{branch}
