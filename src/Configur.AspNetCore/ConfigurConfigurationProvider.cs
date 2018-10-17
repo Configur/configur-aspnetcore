@@ -97,6 +97,12 @@ namespace Configur.AspNetCore
                 ConfigurKeys.IsFileCacheEnabled,
                 _configurOptions.IsFileCacheEnabled.ToString()
             );
+
+            AddOption
+            (
+                ConfigurKeys.RefreshInterval,
+                _configurOptions.RefreshInterval.ToString()
+            );
         }
 
         public override void Load()
