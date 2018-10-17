@@ -24,7 +24,7 @@ for:
     only:
       - master
 
-  version: 0.1.3
+  version: 0.1.4
 
   deploy:
     - provider: Environment
@@ -38,4 +38,4 @@ for:
     except:
     - master
 
-  version: 0.1.3.{build}-{branch}
+  version: 0.1.4.{build}-{branch}

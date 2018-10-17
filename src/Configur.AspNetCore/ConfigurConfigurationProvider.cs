@@ -21,7 +21,6 @@ namespace Configur.AspNetCore
         private readonly string _appPassword;
         private readonly ConfigurOptions _configurOptions;
         private readonly HttpClient _httpClient;
-        private readonly ILogger _logger;
 
         public ConfigurConfigurationProvider
         (
@@ -29,8 +28,7 @@ namespace Configur.AspNetCore
             string appSecret,
             string appPassword,
             ConfigurOptions configurOptions,
-            HttpClient httpClient,
-            ILogger logger
+            HttpClient httpClient
         )
         {
             _appId = appId;
@@ -38,7 +36,6 @@ namespace Configur.AspNetCore
             _appPassword = appPassword;
             _configurOptions = configurOptions;
             _httpClient = httpClient;
-            _logger = logger;
         }
 
         private void AddOption
@@ -49,7 +46,7 @@ namespace Configur.AspNetCore
         {
             if (Data.ContainsKey(key))
             {
-                _logger.Debug
+                SerilogLogger.Instance.Debug
                 (
                     "App setting already added. AppId='{AppId}' AppSettingKey='{AppSettingKey}'",
                     _appId,
@@ -60,7 +57,7 @@ namespace Configur.AspNetCore
             {
                 Data[key] = value;
 
-                _logger.Debug
+                SerilogLogger.Instance.Debug
                 (
                     "Added app setting. AppId='{AppId}' AppSettingKey='{AppSettingKey}'",
                     _appId
@@ -117,7 +114,7 @@ namespace Configur.AspNetCore
 
             try
             {
-                _logger.Information
+                SerilogLogger.Instance.Information
                 (
                     "Attempting to load app settings from the API. AppId='{AppId}'",
                     _appId
@@ -129,7 +126,7 @@ namespace Configur.AspNetCore
                     findAppSettingsResponseContent
                 );
 
-                _logger.Information
+                SerilogLogger.Instance.Information
                 (
                     "Successfully loaded app settings from the API in {ElapsedMilliseconds}ms. AppId='{AppId}'",
                     stopwatch.ElapsedMilliseconds,
@@ -138,7 +135,7 @@ namespace Configur.AspNetCore
             }
             catch (Exception exception)
             {
-                _logger.Error
+                SerilogLogger.Instance.Error
                 (
                     exception,
                     "Failed to load app settings from the API in {ElapsedMilliseconds}ms. AppId='{AppId}'",
@@ -159,7 +156,7 @@ namespace Configur.AspNetCore
                 {
                     try
                     {
-                        _logger.Information
+                        SerilogLogger.Instance.Information
                         (
                             "Attempting to save app settings to the file cache. AppId='{AppId}'",
                             _appId
@@ -177,7 +174,7 @@ namespace Configur.AspNetCore
                             Encoding.UTF8
                         );
 
-                        _logger.Information
+                        SerilogLogger.Instance.Information
                         (
                             "Successfully saved app settings to the file cache. AppId='{AppId}'",
                             _appId
@@ -185,7 +182,7 @@ namespace Configur.AspNetCore
                     }
                     catch (Exception exception)
                     {
-                        _logger.Error
+                        SerilogLogger.Instance.Error
                         (
                             exception,
                             "Failed to save app settings to the file cache. AppId='{AppId}'",
@@ -197,7 +194,7 @@ namespace Configur.AspNetCore
                 {
                     try
                     {
-                        _logger.Information
+                        SerilogLogger.Instance.Information
                         (
                             "Attempting to load app settings from the file cache. AppId='{AppId}'",
                             _appId
@@ -214,7 +211,7 @@ namespace Configur.AspNetCore
                             fileContents
                         );
 
-                        _logger.Information
+                        SerilogLogger.Instance.Information
                         (
                             "Successfully loaded app settings from the file cache. AppId='{AppId}'",
                             _appId
@@ -222,7 +219,7 @@ namespace Configur.AspNetCore
                     }
                     catch (Exception exception)
                     {
-                        _logger.Error
+                        SerilogLogger.Instance.Error
                         (
                             exception,
                             "Failed to load app settings from the file cache. AppId='{AppId}'",
@@ -234,7 +231,7 @@ namespace Configur.AspNetCore
 
             if (projection == null)
             {
-                _logger.Warning
+                SerilogLogger.Instance.Warning
                 (
                     "Failed to load the app settings. AppId='{AppId}'",
                     _appId
@@ -254,7 +251,7 @@ namespace Configur.AspNetCore
             }
             catch (Exception exception)
             {
-                _logger.Error
+                SerilogLogger.Instance.Error
                 (
                     exception,
                     "Failed to decrypt app settings. AppId='{AppId}'",
@@ -282,7 +279,7 @@ namespace Configur.AspNetCore
                 }
             }
 
-            _logger.Information
+            SerilogLogger.Instance.Information
             (
                 "Added " + appSettingCount + " app setting(s). AppId='{AppId}'",
                 _appId
@@ -302,7 +299,7 @@ namespace Configur.AspNetCore
             }
             else
             {
-                _logger.Debug
+                SerilogLogger.Instance.Debug
                 (
                     "Calling IdentityServer to retrieve access token. AppId='{AppId}'",
                     _appId
@@ -332,7 +329,7 @@ namespace Configur.AspNetCore
                 );
             }
 
-            _logger.Debug
+            SerilogLogger.Instance.Debug
             (
                 "Calling API to retrieve app settings. AppId='{AppId}'",
                 _appId
@@ -353,7 +350,7 @@ namespace Configur.AspNetCore
         {
             var virgilCrypto = new VirgilCrypto();
 
-            _logger.Debug
+            SerilogLogger.Instance.Debug
             (
                 "Generating the key hash. AppId='{AppId}'",
                 _appId
@@ -370,7 +367,7 @@ namespace Configur.AspNetCore
                 )
             );
 
-            _logger.Debug
+            SerilogLogger.Instance.Debug
             (
                 "Importing the private key. AppId='{AppId}'",
                 _appId
@@ -382,7 +379,7 @@ namespace Configur.AspNetCore
                 appKey
             );
 
-            _logger.Debug
+            SerilogLogger.Instance.Debug
             (
                 "Decrypting the app settings. AppId='{AppId}'",
                 _appId

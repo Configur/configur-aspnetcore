@@ -20,8 +20,7 @@ namespace Configur.AspNetCore
             string appSecret,
             string appPassword,
             ConfigurOptions configurOptions,
-            HttpClient httpClient,
-            ILogger logger
+            HttpClient httpClient
         )
         {
             _appId = appId;
@@ -29,7 +28,6 @@ namespace Configur.AspNetCore
             _appPassword = appPassword;
             _configurOptions = configurOptions;
             _httpClient = httpClient;
-            _logger = logger;
         }
 
         public IConfigurationProvider Build
@@ -43,8 +41,7 @@ namespace Configur.AspNetCore
                 _appSecret,
                 _appPassword,
                 _configurOptions,
-                _httpClient,
-                _logger
+                _httpClient
             );
         }
     }

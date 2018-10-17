@@ -12,20 +12,17 @@ namespace Configur.AspNetCore
         : IHostedService, IDisposable
     {
         private readonly IConfiguration _configuration;
-        private readonly ILogger<ConfigurRefresherScheduledTask> _logger;
         private Timer _timer;
         private readonly IBackgroundTaskQueue _queue;
 
         public ConfigurRefresherScheduledTask
         (
             IConfiguration configuration,
-            IBackgroundTaskQueue queue,
-            ILogger<ConfigurRefresherScheduledTask> logger
+            IBackgroundTaskQueue queue
         )
         {
             _configuration = configuration;
             _queue = queue;
-            _logger = logger;
         }
 
         public async Task StartAsync
@@ -33,6 +30,8 @@ namespace Configur.AspNetCore
             CancellationToken cancellationToken
         )
         {
+            var appId = _configuration[ConfigurKeys.AppId];
+
             try
             {
                 var reloadInterval = TimeSpan.Parse
@@ -47,12 +46,16 @@ namespace Configur.AspNetCore
                     reloadInterval,
                     reloadInterval
                 );
+
+                SerilogLogger.Instance.Information
+                (
+                    "Started app setting refresher. AppId='{AppId}'",
+                    appId
+                );
             }
             catch (Exception exception)
             {
-                var appId = _configuration[ConfigurKeys.AppId];
-
-                _logger.LogError
+                SerilogLogger.Instance.Error
                 (
                     exception,
                     "Failed to start app setting refresher. AppId='{AppId}'",
@@ -72,7 +75,7 @@ namespace Configur.AspNetCore
 
             try
             {
-                _logger.LogInformation
+                SerilogLogger.Instance.Information
                 (
                     "Reloading configuration via refresher. AppId='{AppId}'",
                     appId
@@ -88,11 +91,10 @@ namespace Configur.AspNetCore
             }
             catch (Exception exception)
             {
-
-                _logger.LogError
+                SerilogLogger.Instance.Error
                 (
                     exception,
-                    "Failed to refresh app settings. AppId='{AppId}'",
+                    "Failed to reload configuration via refresher. AppId='{AppId}'",
                     appId
                 );
 
@@ -110,6 +112,14 @@ namespace Configur.AspNetCore
             _timer?.Change(Timeout.Infinite, 0);
 
             Dispose();
+
+            var appId = _configuration[ConfigurKeys.AppId];
+
+            SerilogLogger.Instance.Information
+            (
+                "Stopped app setting refresher. AppId='{AppId}'",
+                appId
+            );
 
             return Task.CompletedTask;
         }

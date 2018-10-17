@@ -70,16 +70,7 @@ namespace Configur.AspNetCore
 
             var configurOptions = new ConfigurOptions();
             options(configurOptions);
-
-            var logger = new LoggerConfiguration()
-                .Enrich.FromLogContext()
-                .WriteTo.File
-                (
-                    "configur.log",
-                    rollingInterval: RollingInterval.Day
-                )
-              .CreateLogger();
-
+            
             var configurationSource = new ConfigurConfigurationSource
             (
                 appId.Value,
@@ -95,15 +86,14 @@ namespace Configur.AspNetCore
                         (
                             new SerilogLoggerFactory
                             (
-                                logger
+                                SerilogLogger.Instance
                             )
                         )
                     )
                 )
                 {
                     Timeout = TimeSpan.FromSeconds(5),
-                },
-                logger
+                }
             );
 
             extended.Add(configurationSource);
