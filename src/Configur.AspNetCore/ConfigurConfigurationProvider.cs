@@ -284,7 +284,7 @@ namespace Configur.AspNetCore
 
             _logger.Information
             (
-                "Added " + appSettingCount + " app settings. AppId='{AppId}'",
+                "Added " + appSettingCount + " app setting(s). AppId='{AppId}'",
                 _appId
             );
         }

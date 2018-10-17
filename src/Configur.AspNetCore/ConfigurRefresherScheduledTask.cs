@@ -68,8 +68,16 @@ namespace Configur.AspNetCore
             object state
         )
         {
+            var appId = _configuration[ConfigurKeys.AppId];
+
             try
             {
+                _logger.LogInformation
+                (
+                    "Reloading configuration via refresher. AppId='{AppId}'",
+                    appId
+                );
+
                 ((IConfigurationRoot)_configuration).Reload();
 
                 _queue.DequeueAsync(default(CancellationToken))
@@ -78,9 +86,8 @@ namespace Configur.AspNetCore
 
                 _queue.QueueBackgroundWorkItem(ConfigurSignalR.QueueWorkItem);
             }
-            catch ( Exception exception)
+            catch (Exception exception)
             {
-                var appId = _configuration[ConfigurKeys.AppId];
 
                 _logger.LogError
                 (

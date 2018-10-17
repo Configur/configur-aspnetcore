@@ -20,6 +20,8 @@ namespace Configur.AspNetCore
             using (var scope = serviceProvider.CreateScope())
             {
                 var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+                var logger = scope.ServiceProvider.GetRequiredService<ILogger<ConfigurSignalR>>();
+
                 var appId = configuration[ConfigurKeys.AppId];
                 var signalRUrl = configuration[ConfigurKeys.SignalRUrl];
                 var signalRAccessToken = configuration[ConfigurKeys.SignalRAccessToken];
@@ -48,6 +50,12 @@ namespace Configur.AspNetCore
                         "ValuablesDeposited",
                         (string vaultId) =>
                         {
+                            logger.LogInformation
+                            (
+                                "Reloading configuration via SignalR. AppId='{AppId}'",
+                                appId
+                            );
+
                             ((IConfigurationRoot)configuration).Reload();
                         }
                     );
@@ -59,8 +67,6 @@ namespace Configur.AspNetCore
                 }
                 catch (Exception exception)
                 {
-                    var logger = scope.ServiceProvider.GetRequiredService<ILogger<ConfigurSignalR>>();
-
                     logger.LogError
                     (
                         exception,
