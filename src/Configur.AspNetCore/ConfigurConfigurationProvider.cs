@@ -76,6 +76,12 @@ namespace Configur.AspNetCore
 
             AddOption
             (
+                ConfigurKeys.AppId,
+                _appId
+            );
+
+            AddOption
+            (
                 ConfigurKeys.IdentityServerAuthority,
                 _configurOptions.IdentityServerAuthority
             );
