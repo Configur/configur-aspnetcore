@@ -116,7 +116,7 @@ namespace Configur.AspNetCore
             this IServiceCollection extended
         )
         {
-            extended.AddHostedService<ConfigurTimedRefresher>();
+            extended.AddHostedService<ConfigurRefresherScheduledTask>();
             extended.AddHostedService<QueuedHostedService>();
             extended.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
 

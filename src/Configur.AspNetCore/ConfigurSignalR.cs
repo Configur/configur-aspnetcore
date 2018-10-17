@@ -5,10 +5,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Configur.AspNetCore
 {
-    public static class ConfigurSignalR
+    public class ConfigurSignalR
     {
         public static async Task QueueWorkItem
         (
@@ -19,37 +20,54 @@ namespace Configur.AspNetCore
             using (var scope = serviceProvider.CreateScope())
             {
                 var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+                var appId = configuration[ConfigurKeys.AppId];
+                var signalRUrl = configuration[ConfigurKeys.SignalRUrl];
+                var signalRAccessToken = configuration[ConfigurKeys.SignalRAccessToken];
 
-                var hubConnection = new HubConnectionBuilder()
-                    .WithUrl
-                    (
-                        configuration["__configur-signalr-url"],
-                        o =>
-                        {
-                            o.AccessTokenProvider = () =>
+                try
+                {
+                    var hubConnection = new HubConnectionBuilder()
+                        .WithUrl
+                        (
+                            signalRUrl,
+                            o =>
                             {
-                                return Task.FromResult
-                                (
-                                    configuration["__configur-signalr-accesstoken"]
-                                );
-                            };
+                                o.AccessTokenProvider = () =>
+                                {
+                                    return Task.FromResult
+                                    (
+                                        signalRAccessToken
+                                    );
+                                };
+                            }
+                        )
+                        .Build();
+
+                    hubConnection.On
+                    (
+                        "ValuablesDeposited",
+                        (string vaultId) =>
+                        {
+                            ((IConfigurationRoot)configuration).Reload();
                         }
-                    )
-                    .Build();
+                    );
 
-                hubConnection.On
-                (
-                    "ValuablesDeposited",
-                    (string vaultId) =>
-                    {
-                        ((IConfigurationRoot)configuration).Reload();
-                    }
-                );
+                    await hubConnection.StartAsync(cancellationToken);
 
-                await hubConnection.StartAsync(cancellationToken);
+                    Process.GetCurrentProcess()
+                        .WaitForExit();
+                }
+                catch (Exception exception)
+                {
+                    var logger = scope.ServiceProvider.GetRequiredService<ILogger<ConfigurSignalR>>();
 
-                Process.GetCurrentProcess()
-                    .WaitForExit();
+                    logger.LogError
+                    (
+                        exception,
+                        "Failed to add SignalR. AppId='{AppId}'",
+                        appId
+                    );
+                }
             }
         }
     }
