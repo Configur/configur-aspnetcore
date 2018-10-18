@@ -1,4 +1,5 @@
 ﻿using Serilog;
+using Serilog.Events;
 
 namespace Configur.AspNetCore
 {
@@ -8,6 +9,7 @@ namespace Configur.AspNetCore
         {
             Instance = new LoggerConfiguration()
                 .Enrich.FromLogContext()
+                .MinimumLevel.Is(LogEventLevel.Debug) // TODO Make configurable
                 .WriteTo.File
                 (
                     "configur.log",
