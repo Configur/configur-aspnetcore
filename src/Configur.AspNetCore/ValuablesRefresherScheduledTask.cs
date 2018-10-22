@@ -8,14 +8,14 @@ using Microsoft.Extensions.Logging;
 
 namespace Configur.AspNetCore
 {
-    public class ConfigurRefresherScheduledTask
+    public class ValuablesRefresherScheduledTask
         : IHostedService, IDisposable
     {
         private readonly IConfiguration _configuration;
         private Timer _timer;
         private readonly IBackgroundTaskQueue _queue;
 
-        public ConfigurRefresherScheduledTask
+        public ValuablesRefresherScheduledTask
         (
             IConfiguration configuration,
             IBackgroundTaskQueue queue
@@ -39,6 +39,13 @@ namespace Configur.AspNetCore
                     _configuration[ConfigurKeys.RefreshInterval]
                 );
 
+                SerilogLogger.Instance.Information
+                (
+                    "Attemtping to start valuables refresher. AppId='{AppId}' ReloadInterval='{ReloadInterval}'",
+                    appId,
+                    reloadInterval
+                );
+
                 _timer = new Timer
                 (
                     Refresh,
@@ -49,7 +56,7 @@ namespace Configur.AspNetCore
 
                 SerilogLogger.Instance.Information
                 (
-                    "Started app setting refresher. AppId='{AppId}'",
+                    "Started valuables refresher. AppId='{AppId}'",
                     appId
                 );
             }
@@ -58,7 +65,7 @@ namespace Configur.AspNetCore
                 SerilogLogger.Instance.Error
                 (
                     exception,
-                    "Failed to start app setting refresher. AppId='{AppId}'",
+                    "Failed to start valubles refresher. AppId='{AppId}'",
                     appId
                 );
 
@@ -87,7 +94,7 @@ namespace Configur.AspNetCore
                     .GetAwaiter()
                     .GetResult();
 
-                _queue.QueueBackgroundWorkItem(ConfigurSignalR.QueueWorkItem);
+                _queue.QueueBackgroundWorkItem(BackgroundTasks.SignalR);
             }
             catch (Exception exception)
             {
@@ -117,7 +124,7 @@ namespace Configur.AspNetCore
 
             SerilogLogger.Instance.Information
             (
-                "Stopped app setting refresher. AppId='{AppId}'",
+                "Stopped valuables refresher. AppId='{AppId}'",
                 appId
             );
 

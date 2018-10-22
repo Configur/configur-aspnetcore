@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 
 namespace Configur.AspNetCore
 {
-    public interface IAppSettingsClient
+    public interface IValuablesClient
     {
-        Task<IReadOnlyCollection<AppSetting>> FindAsync
+        Task<IReadOnlyCollection<Valuable>> FindValuablesAsync
         (
             string appId,
             string appSecret,

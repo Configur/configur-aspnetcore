@@ -1,6 +1,6 @@
 ﻿namespace Configur.AspNetCore
 {
-    public class FindAppSettingsProjection
+    public class FindValuablesProjection
     {
         public string Ciphertext { get; set; }
         public string ETag { get; set; }

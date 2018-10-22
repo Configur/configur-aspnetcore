@@ -49,9 +49,9 @@ namespace Configur.AspNetCore
             {
                 SerilogLogger.Instance.Debug
                 (
-                    "App setting already added. AppId='{AppId}' AppSettingKey='{AppSettingKey}'",
+                    "App setting already added. AppId='{AppId}' ValuableKey='{ValuableKey}'",
                     _appId,
-                    value
+                    key
                 );
             }
             else
@@ -60,8 +60,9 @@ namespace Configur.AspNetCore
 
                 SerilogLogger.Instance.Debug
                 (
-                    "Added app setting. AppId='{AppId}' AppSettingKey='{AppSettingKey}'",
-                    _appId
+                    "Added app setting. AppId='{AppId}' ValuableKey='{ValuableKey}'",
+                    _appId,
+                    key
                 );
 
             }
@@ -120,8 +121,8 @@ namespace Configur.AspNetCore
         {
             Data = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
-            FindAppSettingsProjection projection = null;
-            string findAppSettingsResponseContent = null;
+            FindValuablesProjection projection = null;
+            string findValuablesResponseContent = null;
 
             var stopwatch = Stopwatch.StartNew();
 
@@ -129,19 +130,19 @@ namespace Configur.AspNetCore
             {
                 SerilogLogger.Instance.Information
                 (
-                    "Attempting to load app settings from the API. AppId='{AppId}'",
+                    "Attempting to find valuables from the API. AppId='{AppId}'",
                     _appId
                 );
 
-                findAppSettingsResponseContent = await FindAppSettingsAsync();
-                projection = JsonConvert.DeserializeObject<FindAppSettingsProjection>
+                findValuablesResponseContent = await FindValuablesAsync();
+                projection = JsonConvert.DeserializeObject<FindValuablesProjection>
                 (
-                    findAppSettingsResponseContent
+                    findValuablesResponseContent
                 );
 
                 SerilogLogger.Instance.Information
                 (
-                    "Successfully loaded app settings from the API in {ElapsedMilliseconds}ms. AppId='{AppId}'",
+                    "Successfully found valuables from the API in {ElapsedMilliseconds}ms. AppId='{AppId}'",
                     stopwatch.ElapsedMilliseconds,
                     _appId
                 );
@@ -151,7 +152,7 @@ namespace Configur.AspNetCore
                 SerilogLogger.Instance.Error
                 (
                     exception,
-                    "Failed to load app settings from the API in {ElapsedMilliseconds}ms. AppId='{AppId}'",
+                    "Failed to find valuables from the API in {ElapsedMilliseconds}ms. AppId='{AppId}'",
                     stopwatch.ElapsedMilliseconds,
                     _appId
                 );
@@ -163,7 +164,7 @@ namespace Configur.AspNetCore
 
             if (_configurOptions.IsFileCacheEnabled)
             {
-                var fileCachePath = $"configur_appsettings_{_appId}.json";
+                var fileCachePath = $"configur_find-valuables_{_appId}.json";
 
                 if (projection != null)
                 {
@@ -171,7 +172,7 @@ namespace Configur.AspNetCore
                     {
                         SerilogLogger.Instance.Information
                         (
-                            "Attempting to save app settings to the file cache. AppId='{AppId}'",
+                            "Attempting to save valuables to the file cache. AppId='{AppId}'",
                             _appId
                         );
 
@@ -183,13 +184,13 @@ namespace Configur.AspNetCore
                         File.WriteAllText
                         (
                             fileCachePath,
-                            findAppSettingsResponseContent,
+                            findValuablesResponseContent,
                             Encoding.UTF8
                         );
 
                         SerilogLogger.Instance.Information
                         (
-                            "Successfully saved app settings to the file cache. AppId='{AppId}'",
+                            "Successfully saved valuables to the file cache. AppId='{AppId}'",
                             _appId
                         );
                     }
@@ -198,7 +199,7 @@ namespace Configur.AspNetCore
                         SerilogLogger.Instance.Error
                         (
                             exception,
-                            "Failed to save app settings to the file cache. AppId='{AppId}'",
+                            "Failed to save valuables to the file cache. AppId='{AppId}'",
                             _appId
                         );
                     }
@@ -209,7 +210,7 @@ namespace Configur.AspNetCore
                     {
                         SerilogLogger.Instance.Information
                         (
-                            "Attempting to load app settings from the file cache. AppId='{AppId}'",
+                            "Attempting to load valuables from the file cache. AppId='{AppId}'",
                             _appId
                         );
 
@@ -219,14 +220,14 @@ namespace Configur.AspNetCore
                             Encoding.UTF8
                         );
 
-                        projection = JsonConvert.DeserializeObject<FindAppSettingsProjection>
+                        projection = JsonConvert.DeserializeObject<FindValuablesProjection>
                         (
                             fileContents
                         );
 
                         SerilogLogger.Instance.Information
                         (
-                            "Successfully loaded app settings from the file cache. AppId='{AppId}'",
+                            "Successfully loaded valuables from the file cache. AppId='{AppId}'",
                             _appId
                         );
                     }
@@ -235,7 +236,7 @@ namespace Configur.AspNetCore
                         SerilogLogger.Instance.Error
                         (
                             exception,
-                            "Failed to load app settings from the file cache. AppId='{AppId}'",
+                            "Failed to load valuables from the file cache. AppId='{AppId}'",
                             _appId
                         );
                     }
@@ -246,18 +247,18 @@ namespace Configur.AspNetCore
             {
                 SerilogLogger.Instance.Warning
                 (
-                    "Failed to load the app settings. AppId='{AppId}'",
+                    "Failed to add app settings. AppId='{AppId}'",
                     _appId
                 );
 
                 return;
             }
 
-            IReadOnlyCollection<AppSetting> appSettings = null;
+            IReadOnlyCollection<Valuable> valuables = null;
 
             try
             {
-                appSettings = DecryptAppSettingsCiphertext
+                valuables = DecryptValuablesCiphertext
                 (
                     projection
                 );
@@ -267,39 +268,39 @@ namespace Configur.AspNetCore
                 SerilogLogger.Instance.Error
                 (
                     exception,
-                    "Failed to decrypt app settings. AppId='{AppId}'",
+                    "Failed to decrypt valuables. AppId='{AppId}'",
                     _appId
                 );
             }
 
-            var appSettingCount = 0;
+            var valuableCount = 0;
 
-            if (appSettings != null)
+            if (valuables != null)
             {
                 AddConfigurOptions();
 
-                foreach (var appSetting in appSettings)
+                foreach (var valuable in valuables)
                 {
-                    var key = appSetting.Key;
+                    var key = valuable.Key;
 
                     AddOption
                     (
                         key,
-                        appSetting.Value
+                        valuable.Value
                     );
 
-                    appSettingCount++;
+                    valuableCount++;
                 }
             }
 
             SerilogLogger.Instance.Information
             (
-                "Added " + appSettingCount + " app setting(s). AppId='{AppId}'",
+                "Added " + valuableCount + " app setting(s). AppId='{AppId}'",
                 _appId
             );
         }
 
-        public async Task<string> FindAppSettingsAsync()
+        public async Task<string> FindValuablesAsync()
         {
             var request = new HttpRequestMessage
             {
@@ -357,9 +358,9 @@ namespace Configur.AspNetCore
             return await response.Content.ReadAsStringAsync();
         }
 
-        public IReadOnlyCollection<AppSetting> DecryptAppSettingsCiphertext
+        public IReadOnlyCollection<Valuable> DecryptValuablesCiphertext
         (
-            FindAppSettingsProjection projection
+            FindValuablesProjection projection
         )
         {
             var virgilCrypto = new VirgilCrypto();
@@ -399,7 +400,7 @@ namespace Configur.AspNetCore
                 _appId
             );
 
-            var valuables = Encoding.UTF8.GetString
+            var decrypted = Encoding.UTF8.GetString
             (
                 virgilCrypto.Decrypt
                 (
@@ -408,9 +409,9 @@ namespace Configur.AspNetCore
                 )
             );
 
-            var appSettings = JsonConvert.DeserializeObject<IReadOnlyCollection<AppSetting>>
+            var valuables = JsonConvert.DeserializeObject<IReadOnlyCollection<Valuable>>
             (
-                valuables
+                decrypted
             );
 
             AddOption
@@ -425,7 +426,7 @@ namespace Configur.AspNetCore
                 projection.SignalR.Url
             );
 
-            return appSettings;
+            return valuables;
         }
     }
 }

@@ -8,9 +8,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Configur.AspNetCore
 {
-    public static class ConfigurSignalR
+    public static class BackgroundTasks
     {
-        public static async Task QueueWorkItem
+        public static async Task SignalR
         (
             IServiceProvider serviceProvider,
             CancellationToken cancellationToken

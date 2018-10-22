@@ -106,7 +106,7 @@ namespace Configur.AspNetCore
             this IServiceCollection extended
         )
         {
-            extended.AddHostedService<ConfigurRefresherScheduledTask>();
+            extended.AddHostedService<ValuablesRefresherScheduledTask>();
             extended.AddHostedService<QueuedHostedService>();
             extended.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
 
@@ -119,7 +119,7 @@ namespace Configur.AspNetCore
         )
         {
             var queue = extended.ApplicationServices.GetService<IBackgroundTaskQueue>();
-            queue.QueueBackgroundWorkItem(ConfigurSignalR.QueueWorkItem);
+            queue.QueueBackgroundWorkItem(BackgroundTasks.SignalR);
 
             return extended;
         }
