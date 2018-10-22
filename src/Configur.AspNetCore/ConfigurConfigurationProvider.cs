@@ -304,7 +304,7 @@ namespace Configur.AspNetCore
         {
             var request = new HttpRequestMessage
             {
-                RequestUri = new Uri($"https://{_configurOptions.ApiHost}/app-settings/find")
+                RequestUri = new Uri($"https://{_configurOptions.ApiHost}/valuables/find")
             };
 
             if (_configurOptions.IsDevelopment)
