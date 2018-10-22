@@ -39,35 +39,6 @@ namespace Configur.AspNetCore
             _httpClient = httpClient;
         }
 
-        private void AddOption
-        (
-            string key,
-            string value
-        )
-        {
-            if (Data.ContainsKey(key))
-            {
-                SerilogLogger.Instance.Debug
-                (
-                    "App setting already added. AppId='{AppId}' ValuableKey='{ValuableKey}'",
-                    _appId,
-                    key
-                );
-            }
-            else
-            {
-                Data[key] = value;
-
-                SerilogLogger.Instance.Debug
-                (
-                    "Added app setting. AppId='{AppId}' ValuableKey='{ValuableKey}'",
-                    _appId,
-                    key
-                );
-
-            }
-        }
-
         private void AddConfigurOptions()
         {
             AddOption
@@ -107,6 +78,35 @@ namespace Configur.AspNetCore
             );
         }
 
+        private void AddOption
+        (
+            string key,
+            string value
+        )
+        {
+            if (Data.ContainsKey(key))
+            {
+                SerilogLogger.Instance.Debug
+                (
+                    "App setting already added. AppId='{AppId}' ValuableKey='{ValuableKey}'",
+                    _appId,
+                    key
+                );
+            }
+            else
+            {
+                Data[key] = value;
+
+                SerilogLogger.Instance.Debug
+                (
+                    "Added app setting. AppId='{AppId}' ValuableKey='{ValuableKey}'",
+                    _appId,
+                    key
+                );
+
+            }
+        }
+
         public override void Load()
         {
             Task.Run(async () =>
@@ -120,6 +120,8 @@ namespace Configur.AspNetCore
         private async Task LoadAsync()
         {
             Data = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+            AddConfigurOptions();
 
             FindValuablesProjection projection = null;
             string findValuablesResponseContent = null;
@@ -277,8 +279,6 @@ namespace Configur.AspNetCore
 
             if (valuables != null)
             {
-                AddConfigurOptions();
-
                 foreach (var valuable in valuables)
                 {
                     var key = valuable.Key;
