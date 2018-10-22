@@ -8,8 +8,9 @@ using System.Threading.Tasks;
 using IdentityModel.Client;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
-using Serilog;
 using Virgil.Crypto;
+using static IdentityModel.OidcConstants;
+using TokenRequest = IdentityModel.Client.TokenRequest;
 
 namespace Configur.AspNetCore
 {
@@ -324,6 +325,7 @@ namespace Configur.AspNetCore
                         Address = $"{_configurOptions.IdentityServerAuthority.TrimEnd('/')}/connect/token",
                         ClientId = _appId,
                         ClientSecret = _appSecret,
+                        GrantType = GrantTypes.ClientCredentials,
                         Parameters =
                         {
                             {
