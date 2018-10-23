@@ -337,6 +337,8 @@ namespace Configur.AspNetCore
                     }
                 );
 
+                // TODO Check tokenResponse.IsError
+
                 request.Headers.Add
                 (
                     "Authorization",
@@ -378,7 +380,8 @@ namespace Configur.AspNetCore
                     Encoding.UTF8.GetBytes
                     (
                         _appPassword
-                    )
+                    ),
+                    HashAlgorithm.SHA512
                 )
             );
 
