@@ -103,12 +103,26 @@ namespace Configur.AspNetCore
 
         public static IServiceCollection AddConfigur
         (
-            this IServiceCollection extended
+            this IServiceCollection extended,
+            IConfiguration congfiguration
         )
         {
             extended.AddHostedService<ValuablesRefresherScheduledTask>();
             extended.AddHostedService<QueuedHostedService>();
             extended.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
+
+            try
+            {
+                extended.AddSingleton(congfiguration);
+            }
+            catch (Exception exception)
+            {
+                SerilogLogger.Instance.Information
+                (
+                    exception,
+                    "Failed to register IConfiguration singleton"
+                );
+            }
 
             return extended;
         }
