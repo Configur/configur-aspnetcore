@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Serilog;
 
 namespace Configur.AspNetCore
 {
@@ -38,8 +37,18 @@ namespace Configur.AspNetCore
             Action<ConfigurOptions> options
         )
         {
+            SerilogLogger.Instance.Warning
+            (
+                "Adding Configur to IConfigurationBuilder."
+            );
+
             if (string.IsNullOrWhiteSpace(connectionString))
             {
+                SerilogLogger.Instance.Warning
+                (
+                    "Failed to add Configur because the connection string is null or empty."
+                );
+
                 return extended;
             }
 
@@ -65,6 +74,14 @@ namespace Configur.AspNetCore
                 || appSecret == null
                 || appPassword == null)
             {
+                SerilogLogger.Instance.Warning
+                (
+                    "Failed to add Configur because the connection string is invalid. AppId='{AppId}' AppSecret='{AppSecret}' AppPassword='{AppPassword}'",
+                    appId,
+                    appSecret,
+                    appPassword
+                );
+
                 return extended;
             }
 
@@ -107,22 +124,14 @@ namespace Configur.AspNetCore
             IConfiguration congfiguration
         )
         {
+            SerilogLogger.Instance.Warning
+            (
+                "Adding Configur to IServiceCollection."
+            );
+
             extended.AddHostedService<ValuablesRefresherScheduledTask>();
             extended.AddHostedService<QueuedHostedService>();
             extended.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
-
-            try
-            {
-                extended.AddSingleton(congfiguration);
-            }
-            catch (Exception exception)
-            {
-                SerilogLogger.Instance.Information
-                (
-                    exception,
-                    "Failed to register IConfiguration singleton"
-                );
-            }
 
             return extended;
         }
@@ -132,6 +141,11 @@ namespace Configur.AspNetCore
             this IApplicationBuilder extended
         )
         {
+            SerilogLogger.Instance.Warning
+            (
+                "Adding Configur to IApplicationBuilder."
+            );
+
             var queue = extended.ApplicationServices.GetService<IBackgroundTaskQueue>();
             queue.QueueBackgroundWorkItem(BackgroundTasks.SignalR);
 

@@ -180,7 +180,8 @@ namespace Configur.AspNetCore
 
                         if (!File.Exists(fileCachePath))
                         {
-                            File.Create(fileCachePath);
+                            File.Create(fileCachePath)
+                                .Dispose();
                         }
 
                         File.WriteAllText
