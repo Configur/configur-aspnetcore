@@ -14,7 +14,15 @@ Once you've created a Vault and added some Valuables, create an App. Each app ha
 ## Usage
 
 1. Install the `Configur.AspNetCore` [NuGet](https://www.nuget.org/packages/Configur.AspNetCore/) package
-2. Add the configuration provider to `ConfigureAppConfiguration` in `Program.cs`
+2. Add the App's connection string to `appsetings.json` (or via Application Settings in Azure with the key `ConfigurConnectionString`)
+
+```
+{
+    "ConfigurConnectionString": "..."
+}
+```
+
+3. Add the configuration provider to `ConfigureAppConfiguration` in `Program.cs`
 
 ```
 public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
@@ -34,7 +42,7 @@ public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
         ...
 ```
 
-3. Add the services to `ConfigureServices` in `Startup.cs`
+4. Add the services to `ConfigureServices` in `Startup.cs`
 
 ```
 public void ConfigureServices(IServiceCollection services)
@@ -45,7 +53,7 @@ public void ConfigureServices(IServiceCollection services)
 }
 ```
 
-4. Add middleware to `Configure` in `Startup.cs`
+5. Add middleware to `Configure` in `Startup.cs`
 
 ```
 public void Configure(IApplicationBuilder app)
