@@ -374,7 +374,7 @@ namespace Configur.AspNetCore
                 _appId
             );
 
-            var appKey = Encoding.UTF8.GetString
+            var appKey = Convert.ToBase64String
             (
                 virgilCrypto.GenerateHash
                 (
