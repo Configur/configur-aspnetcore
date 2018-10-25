@@ -120,8 +120,7 @@ namespace Configur.AspNetCore
 
         public static IServiceCollection AddConfigur
         (
-            this IServiceCollection extended,
-            IConfiguration congfiguration
+            this IServiceCollection extended
         )
         {
             SerilogLogger.Instance.Warning
